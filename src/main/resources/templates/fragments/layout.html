@@ -12,17 +12,11 @@
     <div class="navbar-container">
         <a class="navbar-brand" th:href="@{/}">Jadwal Muballigh</a>
         <ul class="navbar-nav">
-            <li><a th:classappend="${#httpServletRequest.requestURI == '/'} ? 'active' : ''"
-                   th:href="@{/}">Dashboard</a></li>
-            <li><a th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/jadwal')} ? 'active' : ''"
-                   th:href="@{/jadwal}">Jadwal</a>
-            </li>
-            <li><a th:classappend="${#httpServletRequest.requestURI == '/khotib'} ? 'active' : ''" th:href="@{/khotib}">Khotib</a>
-            </li>
-            <li><a th:classappend="${#httpServletRequest.requestURI == '/masjid'} ? 'active' : ''" th:href="@{/masjid}">Masjid</a>
-            </li>
-            <li><a th:classappend="${#httpServletRequest.requestURI == '/area'} ? 'active' : ''"
-                   th:href="@{/area}">Area</a></li>
+            <li><a th:href="@{/}">Dashboard</a></li>
+            <li><a th:href="@{/jadwal}">Jadwal</a></li>
+            <li><a th:href="@{/khotib}">Khotib</a></li>
+            <li><a th:href="@{/masjid}">Masjid</a></li>
+            <li><a th:href="@{/area}">Area</a></li>
         </ul>
     </div>
 </nav>

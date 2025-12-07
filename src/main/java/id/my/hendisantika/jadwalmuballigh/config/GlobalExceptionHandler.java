@@ -22,7 +22,7 @@ import java.util.Map;
  * Time: 21.53
  * To change this template use File | Settings | File Templates.
  */
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "id.my.hendisantika.jadwalmuballigh.controller")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
