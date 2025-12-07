@@ -41,11 +41,19 @@
                 </td>
                 <td class="actions">
                     <button class="btn btn-secondary btn-sm"
-                            th:onclick="'editMasjid(' + ${masjid.id()} + ', \'' + ${masjid.nama()} + '\', \'' + ${masjid.alamat() ?: ''} + '\', ' + ${masjid.kapasitasJamaah() ?: 'null'} + ', ' + ${masjid.latitude() ?: 'null'} + ', ' + ${masjid.longitude() ?: 'null'} + ', ' + ${masjid.areaId() ?: 'null'} + ')'">
+                            onclick="editMasjidFromData(this)"
+                            th:data-alamat="${masjid.alamat()}"
+                            th:data-areaid="${masjid.areaId()}"
+                            th:data-id="${masjid.id()}"
+                            th:data-kapasitas="${masjid.kapasitasJamaah()}"
+                            th:data-latitude="${masjid.latitude()}"
+                            th:data-longitude="${masjid.longitude()}"
+                            th:data-nama="${masjid.nama()}">
                         Edit
                     </button>
                     <button class="btn btn-danger btn-sm"
-                            th:onclick="'deleteMasjid(' + ${masjid.id()} + ')'">
+                            onclick="deleteMasjid(this.dataset.id)"
+                            th:data-id="${masjid.id()}">
                         Hapus
                     </button>
                 </td>
@@ -106,5 +114,19 @@
 </div>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    // Edit masjid from data attributes
+    function editMasjidFromData(button) {
+        const data = button.dataset;
+        document.getElementById('masjidId').value = data.id;
+        document.getElementById('masjidNama').value = data.nama || '';
+        document.getElementById('masjidAlamat').value = data.alamat || '';
+        document.getElementById('masjidKapasitas').value = data.kapasitas || '';
+        document.getElementById('masjidLatitude').value = data.latitude || '';
+        document.getElementById('masjidLongitude').value = data.longitude || '';
+        document.getElementById('masjidAreaId').value = data.areaid || '';
+        openModal('masjidModal');
+    }
+</script>
 </body>
 </html>

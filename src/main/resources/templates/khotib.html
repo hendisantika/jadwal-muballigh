@@ -44,16 +44,29 @@
                 <td th:text="${khotib.maxJadwalPerBulan()} + '/bulan'"></td>
                 <td class="actions">
                     <button class="btn btn-secondary btn-sm"
-                            th:data-khotib="${khotib}"
-                            th:onclick="'editKhotib(' + ${@jacksonObjectMapper.writeValueAsString(khotib)} + ')'">
+                            onclick="editKhotibFromData(this)"
+                            th:data-aktif="${khotib.aktif()}"
+                            th:data-alamat="${khotib.alamat()}"
+                            th:data-id="${khotib.id()}"
+                            th:data-latitude="${khotib.latitude()}"
+                            th:data-longitude="${khotib.longitude()}"
+                            th:data-maxjadwalperbulan="${khotib.maxJadwalPerBulan()}"
+                            th:data-nama="${khotib.nama()}"
+                            th:data-notelepon="${khotib.noTelepon()}"
+                            th:data-pengalamantahun="${khotib.pengalamanTahun()}"
+                            th:data-preferredareaids="${khotib.preferredAreaIds()}"
+                            th:data-rating="${khotib.rating()}"
+                            th:data-spesialisasitema="${khotib.spesialisasiTema()}">
                         Edit
                     </button>
                     <button class="btn btn-warning btn-sm"
-                            th:onclick="'toggleKhotibActive(' + ${khotib.id()} + ')'">
+                            onclick="toggleKhotibActive(this.dataset.id)"
+                            th:data-id="${khotib.id()}">
                         Toggle
                     </button>
                     <button class="btn btn-danger btn-sm"
-                            th:onclick="'deleteKhotib(' + ${khotib.id()} + ')'">
+                            onclick="deleteKhotib(this.dataset.id)"
+                            th:data-id="${khotib.id()}">
                         Hapus
                     </button>
                 </td>
@@ -141,27 +154,30 @@
 </div>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
-<script th:inline="javascript">
-    // Override editKhotib to handle Thymeleaf object
-    function editKhotib(khotibData) {
-        let data = typeof khotibData === 'string' ? JSON.parse(khotibData) : khotibData;
+<script>
+    // Edit khotib from data attributes
+    function editKhotibFromData(button) {
+        const data = button.dataset;
         document.getElementById('khotibId').value = data.id;
-        document.getElementById('khotibNama').value = data.nama;
-        document.getElementById('khotibTelepon').value = data.noTelepon || '';
+        document.getElementById('khotibNama').value = data.nama || '';
+        document.getElementById('khotibTelepon').value = data.notelepon || '';
         document.getElementById('khotibAlamat').value = data.alamat || '';
         document.getElementById('khotibLatitude').value = data.latitude || '';
         document.getElementById('khotibLongitude').value = data.longitude || '';
-        document.getElementById('khotibSpesialisasi').value = data.spesialisasiTema || '';
-        document.getElementById('khotibPengalaman').value = data.pengalamanTahun || '';
+        document.getElementById('khotibSpesialisasi').value = data.spesialisasitema || '';
+        document.getElementById('khotibPengalaman').value = data.pengalamantahun || '';
         document.getElementById('khotibRating').value = data.rating || '';
-        document.getElementById('khotibAktif').checked = data.aktif;
-        document.getElementById('khotibMaxJadwal').value = data.maxJadwalPerBulan || 4;
+        document.getElementById('khotibAktif').checked = data.aktif === 'true';
+        document.getElementById('khotibMaxJadwal').value = data.maxjadwalperbulan || 4;
 
         document.querySelectorAll('input[name="preferredAreaIds"]').forEach(cb => cb.checked = false);
-        if (data.preferredAreaIds) {
-            data.preferredAreaIds.forEach(areaId => {
-                const cb = document.querySelector(`input[name="preferredAreaIds"][value="${areaId}"]`);
-                if (cb) cb.checked = true;
+        if (data.preferredareaids && data.preferredareaids !== '') {
+            const areaIds = data.preferredareaids.replace(/[\[\]]/g, '').split(',').map(s => s.trim());
+            areaIds.forEach(areaId => {
+                if (areaId) {
+                    const cb = document.querySelector(`input[name="preferredAreaIds"][value="${areaId}"]`);
+                    if (cb) cb.checked = true;
+                }
             });
         }
 

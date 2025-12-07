@@ -33,11 +33,16 @@
                 <td th:text="${area.kota() ?: '-'}"></td>
                 <td class="actions">
                     <button class="btn btn-secondary btn-sm"
-                            th:onclick="'editArea(' + ${area.id()} + ', \'' + ${area.nama()} + '\', \'' + ${area.kecamatan() ?: ''} + '\', \'' + ${area.kota() ?: ''} + '\')'">
+                            onclick="editAreaFromData(this)"
+                            th:data-id="${area.id()}"
+                            th:data-kecamatan="${area.kecamatan()}"
+                            th:data-kota="${area.kota()}"
+                            th:data-nama="${area.nama()}">
                         Edit
                     </button>
                     <button class="btn btn-danger btn-sm"
-                            th:onclick="'deleteArea(' + ${area.id()} + ')'">
+                            onclick="deleteArea(this.dataset.id)"
+                            th:data-id="${area.id()}">
                         Hapus
                     </button>
                 </td>
@@ -79,5 +84,16 @@
 </div>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    // Edit area from data attributes
+    function editAreaFromData(button) {
+        const data = button.dataset;
+        document.getElementById('areaId').value = data.id;
+        document.getElementById('areaNama').value = data.nama || '';
+        document.getElementById('areaKecamatan').value = data.kecamatan || '';
+        document.getElementById('areaKota').value = data.kota || '';
+        openModal('areaModal');
+    }
+</script>
 </body>
 </html>
