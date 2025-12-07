@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manajemen Masjid')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 style="margin-bottom: 30px; color: #1a5f2a;">Manajemen Masjid</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Daftar Masjid</h2>
+            <button class="btn btn-primary" onclick="openModal('masjidModal')">+ Tambah Masjid</button>
+        </div>
+
+        <div class="alert alert-info" th:if="${masjids.isEmpty()}">
+            Belum ada masjid terdaftar. Silakan tambahkan masjid baru.
+        </div>
+
+        <table class="table" th:if="${!masjids.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Alamat</th>
+                <th>Area</th>
+                <th>Kapasitas</th>
+                <th>Koordinat</th>
+                <th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="masjid : ${masjids}">
+                <td th:text="${masjid.nama()}"></td>
+                <td th:text="${masjid.alamat() ?: '-'}"></td>
+                <td th:text="${masjid.areaNama() ?: '-'}"></td>
+                <td th:text="${masjid.kapasitasJamaah() != null ? masjid.kapasitasJamaah() + ' jamaah' : '-'}"></td>
+                <td>
+                    <span th:if="${masjid.latitude() != null and masjid.longitude() != null}"
+                          th:text="${masjid.latitude()} + ', ' + ${masjid.longitude()}"></span>
+                    <span th:if="${masjid.latitude() == null or masjid.longitude() == null}">-</span>
+                </td>
+                <td class="actions">
+                    <button class="btn btn-secondary btn-sm"
+                            th:onclick="'editMasjid(' + ${masjid.id()} + ', \'' + ${masjid.nama()} + '\', \'' + ${masjid.alamat() ?: ''} + '\', ' + ${masjid.kapasitasJamaah() ?: 'null'} + ', ' + ${masjid.latitude() ?: 'null'} + ', ' + ${masjid.longitude() ?: 'null'} + ', ' + ${masjid.areaId() ?: 'null'} + ')'">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            th:onclick="'deleteMasjid(' + ${masjid.id()} + ')'">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Masjid Modal -->
+<div class="modal" id="masjidModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Form Masjid</h3>
+            <button class="modal-close" onclick="closeModal('masjidModal')">&times;</button>
+        </div>
+        <form id="masjidForm">
+            <div class="modal-body">
+                <input id="masjidId" name="id" type="hidden">
+                <div class="form-group">
+                    <label for="masjidNama">Nama Masjid *</label>
+                    <input class="form-control" id="masjidNama" name="nama" required type="text">
+                </div>
+                <div class="form-group">
+                    <label for="masjidAlamat">Alamat</label>
+                    <input class="form-control" id="masjidAlamat" name="alamat" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="masjidAreaId">Area</label>
+                    <select class="form-control" id="masjidAreaId" name="areaId">
+                        <option value="">-- Pilih Area --</option>
+                        <option th:each="area : ${areas}"
+                                th:text="${area.nama()}"
+                                th:value="${area.id()}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="masjidKapasitas">Kapasitas Jamaah</label>
+                    <input class="form-control" id="masjidKapasitas" min="0" name="kapasitasJamaah" type="number">
+                </div>
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="masjidLatitude">Latitude</label>
+                        <input class="form-control" id="masjidLatitude" name="latitude" step="any" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="masjidLongitude">Longitude</label>
+                        <input class="form-control" id="masjidLongitude" name="longitude" step="any" type="number">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('masjidModal')" type="button">Batal</button>
+                <button class="btn btn-primary" type="submit">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
