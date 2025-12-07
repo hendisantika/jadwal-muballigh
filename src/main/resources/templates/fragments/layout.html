@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${title}">Jadwal Khotib</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar" th:fragment="navbar">
+    <div class="navbar-container">
+        <a class="navbar-brand" th:href="@{/}">Jadwal Muballigh</a>
+        <ul class="navbar-nav">
+            <li><a th:classappend="${#httpServletRequest.requestURI == '/'} ? 'active' : ''"
+                   th:href="@{/}">Dashboard</a></li>
+            <li><a th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/jadwal')} ? 'active' : ''"
+                   th:href="@{/jadwal}">Jadwal</a>
+            </li>
+            <li><a th:classappend="${#httpServletRequest.requestURI == '/khotib'} ? 'active' : ''" th:href="@{/khotib}">Khotib</a>
+            </li>
+            <li><a th:classappend="${#httpServletRequest.requestURI == '/masjid'} ? 'active' : ''" th:href="@{/masjid}">Masjid</a>
+            </li>
+            <li><a th:classappend="${#httpServletRequest.requestURI == '/area'} ? 'active' : ''"
+                   th:href="@{/area}">Area</a></li>
+        </ul>
+    </div>
+</nav>
+
+<footer th:fragment="footer">
+    <script th:src="@{/js/app.js}"></script>
+</footer>
+
+</body>
+</html>
