@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard - Jadwal Muballigh')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 style="margin-bottom: 30px; color: #1a5f2a;">Dashboard Jadwal Khotib</h1>
+
+    <!-- Stats -->
+    <div class="grid grid-4" style="margin-bottom: 30px;">
+        <div class="stats-card">
+            <h3 th:text="${khotibs.size()}">0</h3>
+            <p>Total Khotib Aktif</p>
+        </div>
+        <div class="stats-card">
+            <h3 th:text="${masjids.size()}">0</h3>
+            <p>Total Masjid</p>
+        </div>
+        <div class="stats-card">
+            <h3 th:text="${areas.size()}">0</h3>
+            <p>Total Area</p>
+        </div>
+        <div class="stats-card">
+            <h3 th:text="${jadwalList.size()}">0</h3>
+            <p>Jadwal Bulan Ini</p>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <!-- Generate Schedule -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Generate Jadwal dengan PSO</h2>
+            </div>
+            <div class="generate-form">
+                <div class="form-group">
+                    <label for="generateBulan">Bulan</label>
+                    <input class="form-control" id="generateBulan" required type="month">
+                </div>
+                <div class="form-group">
+                    <label for="numParticles">Jumlah Partikel</label>
+                    <input class="form-control" id="numParticles" max="200" min="10" type="number" value="50">
+                </div>
+                <div class="form-group">
+                    <label for="maxIterations">Maks Iterasi</label>
+                    <input class="form-control" id="maxIterations" max="500" min="50" type="number" value="100">
+                </div>
+                <button class="btn btn-primary" id="generateBtn" onclick="generateSchedule()" type="button">
+                    Generate Jadwal
+                </button>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+                Algoritma Particle Swarm Optimization akan mengoptimasi penempatan khotib berdasarkan:
+                jarak, preferensi area, pengalaman, rating, dan distribusi yang adil.
+            </p>
+        </div>
+
+        <!-- Current Month Schedule -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title" th:text="'Jadwal ' + ${#temporals.format(currentMonth, 'MMMM yyyy')}">Jadwal
+                    Bulan Ini</h2>
+                <a class="btn btn-secondary btn-sm" th:href="@{/jadwal}">Lihat Semua</a>
+            </div>
+            <div th:if="${jadwalList.isEmpty()}">
+                <p style="color: #666;">Belum ada jadwal untuk bulan ini.</p>
+            </div>
+            <div class="schedule-item" th:each="jadwal : ${jadwalList}" th:if="${#lists.size(jadwalList) <= 5}">
+                <div class="date" th:text="${#temporals.format(jadwal.tanggalJumat(), 'EEEE, d MMMM yyyy')}"></div>
+                <div class="masjid" th:text="${jadwal.masjidNama()}"></div>
+                <div class="khotib" th:text="'Khotib: ' + ${jadwal.khotibNama()}"></div>
+            </div>
+            <div class="schedule-item" th:if="${#lists.size(jadwalList) > 5}">
+                <p th:text="'Menampilkan 5 dari ' + ${#lists.size(jadwalList)} + ' jadwal'"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Lists -->
+    <div class="grid grid-2" style="margin-top: 20px;">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Khotib Aktif</h2>
+                <a class="btn btn-secondary btn-sm" th:href="@{/khotib}">Kelola</a>
+            </div>
+            <table class="table" th:if="${!khotibs.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Pengalaman</th>
+                    <th>Rating</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="khotib, iter : ${khotibs}" th:if="${iter.index < 5}">
+                    <td th:text="${khotib.nama()}"></td>
+                    <td th:text="${khotib.pengalamanTahun()} + ' tahun'"></td>
+                    <td>
+                        <span th:if="${khotib.rating() != null}" th:text="${khotib.rating()} + '/5'"></span>
+                        <span th:if="${khotib.rating() == null}">-</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p style="color: #666;" th:if="${khotibs.isEmpty()}">Belum ada khotib terdaftar.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Daftar Masjid</h2>
+                <a class="btn btn-secondary btn-sm" th:href="@{/masjid}">Kelola</a>
+            </div>
+            <table class="table" th:if="${!masjids.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Area</th>
+                    <th>Kapasitas</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="masjid, iter : ${masjids}" th:if="${iter.index < 5}">
+                    <td th:text="${masjid.nama()}"></td>
+                    <td th:text="${masjid.areaNama() ?: '-'}"></td>
+                    <td th:text="${masjid.kapasitasJamaah() != null ? masjid.kapasitasJamaah() + ' jamaah' : '-'}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p style="color: #666;" th:if="${masjids.isEmpty()}">Belum ada masjid terdaftar.</p>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
