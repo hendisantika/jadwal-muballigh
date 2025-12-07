@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Jadwal Khotib')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 style="margin-bottom: 30px; color: #1a5f2a;">Jadwal Khotib Jum'at</h1>
+
+    <!-- Month Navigator -->
+    <div class="month-nav">
+        <a class="btn btn-secondary" th:href="@{'/jadwal/' + ${currentMonth.minusMonths(1)}}">&lt; Sebelumnya</a>
+        <h2 th:text="${#temporals.format(currentMonth, 'MMMM yyyy')}"></h2>
+        <a class="btn btn-secondary" th:href="@{'/jadwal/' + ${currentMonth.plusMonths(1)}}">Selanjutnya &gt;</a>
+    </div>
+
+    <!-- Generate Schedule -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Generate Jadwal Baru</h2>
+        </div>
+        <div class="generate-form">
+            <div class="form-group">
+                <label for="generateBulan">Bulan</label>
+                <input class="form-control" id="generateBulan" required
+                       th:value="${currentMonth}" type="month">
+            </div>
+            <div class="form-group">
+                <label for="numParticles">Jumlah Partikel PSO</label>
+                <input class="form-control" id="numParticles" max="200" min="10" type="number" value="50">
+            </div>
+            <div class="form-group">
+                <label for="maxIterations">Maksimal Iterasi</label>
+                <input class="form-control" id="maxIterations" max="500" min="50" type="number" value="100">
+            </div>
+            <button class="btn btn-primary" id="generateBtn" onclick="generateSchedule()" type="button">
+                Generate Jadwal
+            </button>
+        </div>
+    </div>
+
+    <!-- Schedule Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Daftar Jadwal</h2>
+        </div>
+
+        <div class="alert alert-info" th:if="${jadwalList.isEmpty()}">
+            Belum ada jadwal untuk bulan ini. Silakan generate jadwal baru.
+        </div>
+
+        <table class="table" th:if="${!jadwalList.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Masjid</th>
+                <th>Khotib</th>
+                <th>Status</th>
+                <th>Fitness Score</th>
+                <th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="jadwal : ${jadwalList}">
+                <td th:text="${#temporals.format(jadwal.tanggalJumat(), 'EEEE, d MMMM yyyy')}"></td>
+                <td th:text="${jadwal.masjidNama()}"></td>
+                <td th:text="${jadwal.khotibNama()}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${jadwal.status() == 'TERJADWAL' ? 'badge-info' :
+                                            jadwal.status() == 'SELESAI' ? 'badge-success' :
+                                            jadwal.status() == 'DIBATALKAN' ? 'badge-danger' : 'badge-warning'}"
+                          th:text="${jadwal.status()}"></span>
+                </td>
+                <td>
+                    <div class="fitness-score" th:if="${jadwal.fitnessScore() != null}">
+                        <div class="fitness-bar">
+                            <div class="fitness-fill" th:style="'width: ' + ${jadwal.fitnessScore() * 2} + '%'"></div>
+                        </div>
+                        <span th:text="${#numbers.formatDecimal(jadwal.fitnessScore(), 1, 2)}"></span>
+                    </div>
+                    <span th:if="${jadwal.fitnessScore() == null}">-</span>
+                </td>
+                <td class="actions">
+                    <button class="btn btn-warning btn-sm"
+                            th:onclick="'openChangeKhotibModal(' + ${jadwal.id()} + ', ' + ${jadwal.khotibId()} + ')'">
+                        Ganti
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            th:onclick="'deleteJadwal(' + ${jadwal.id()} + ')'">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Change Khotib Modal -->
+<div class="modal" id="changeKhotibModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Ganti Khotib</h3>
+            <button class="modal-close" onclick="closeModal('changeKhotibModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input id="changeJadwalId" type="hidden">
+            <div class="form-group">
+                <label for="changeKhotibId">Pilih Khotib Pengganti</label>
+                <select class="form-control" id="changeKhotibId">
+                    <option th:each="khotib : ${khotibs}"
+                            th:text="${khotib.nama()}"
+                            th:value="${khotib.id()}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('changeKhotibModal')">Batal</button>
+            <button class="btn btn-primary" onclick="confirmChangeKhotib()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
