@@ -1,0 +1,30 @@
+package id.my.hendisantika.jadwalmuballigh.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+/**
+ * Created by IntelliJ IDEA.
+ * Project : jadwal-muballigh
+ * User: hendisantika
+ * Link: s.id/hendisantika
+ * Email: hendisantika@yahoo.co.id
+ * Telegram : @hendisantika34
+ * Date: 07/11/25
+ * Time: 21.53
+ * To change this template use File | Settings | File Templates.
+ */
+@Configuration
+public class JacksonConfig {
+
+    @Bean
+    @Primary
+    public ObjectMapper jacksonObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
+}
