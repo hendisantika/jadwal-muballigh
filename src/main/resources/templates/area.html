@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manajemen Area')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 style="margin-bottom: 30px; color: #1a5f2a;">Manajemen Area</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Daftar Area</h2>
+            <button class="btn btn-primary" onclick="openModal('areaModal')">+ Tambah Area</button>
+        </div>
+
+        <div class="alert alert-info" th:if="${areas.isEmpty()}">
+            Belum ada area terdaftar. Silakan tambahkan area baru.
+        </div>
+
+        <table class="table" th:if="${!areas.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Nama Area</th>
+                <th>Kecamatan</th>
+                <th>Kota</th>
+                <th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="area : ${areas}">
+                <td th:text="${area.nama()}"></td>
+                <td th:text="${area.kecamatan() ?: '-'}"></td>
+                <td th:text="${area.kota() ?: '-'}"></td>
+                <td class="actions">
+                    <button class="btn btn-secondary btn-sm"
+                            th:onclick="'editArea(' + ${area.id()} + ', \'' + ${area.nama()} + '\', \'' + ${area.kecamatan() ?: ''} + '\', \'' + ${area.kota() ?: ''} + '\')'">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            th:onclick="'deleteArea(' + ${area.id()} + ')'">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Area Modal -->
+<div class="modal" id="areaModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Form Area</h3>
+            <button class="modal-close" onclick="closeModal('areaModal')">&times;</button>
+        </div>
+        <form id="areaForm">
+            <div class="modal-body">
+                <input id="areaId" name="id" type="hidden">
+                <div class="form-group">
+                    <label for="areaNama">Nama Area *</label>
+                    <input class="form-control" id="areaNama" name="nama" required type="text">
+                </div>
+                <div class="form-group">
+                    <label for="areaKecamatan">Kecamatan</label>
+                    <input class="form-control" id="areaKecamatan" name="kecamatan" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="areaKota">Kota</label>
+                    <input class="form-control" id="areaKota" name="kota" type="text">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('areaModal')" type="button">Batal</button>
+                <button class="btn btn-primary" type="submit">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
