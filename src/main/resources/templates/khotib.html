@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manajemen Khotib')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 style="margin-bottom: 30px; color: #1a5f2a;">Manajemen Khotib</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Daftar Khotib</h2>
+            <button class="btn btn-primary" onclick="openModal('khotibModal')">+ Tambah Khotib</button>
+        </div>
+
+        <div class="alert alert-info" th:if="${khotibs.isEmpty()}">
+            Belum ada khotib terdaftar. Silakan tambahkan khotib baru.
+        </div>
+
+        <table class="table" th:if="${!khotibs.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Nama</th>
+                <th>No. Telepon</th>
+                <th>Spesialisasi</th>
+                <th>Pengalaman</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Maks Jadwal</th>
+                <th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="khotib : ${khotibs}">
+                <td th:text="${khotib.nama()}"></td>
+                <td th:text="${khotib.noTelepon() ?: '-'}"></td>
+                <td th:text="${khotib.spesialisasiTema() ?: '-'}"></td>
+                <td th:text="${khotib.pengalamanTahun() != null ? khotib.pengalamanTahun() + ' tahun' : '-'}"></td>
+                <td th:text="${khotib.rating() != null ? khotib.rating() + '/5' : '-'}"></td>
+                <td>
+                    <span class="badge" th:classappend="${khotib.aktif()} ? 'badge-success' : 'badge-danger'"
+                          th:text="${khotib.aktif()} ? 'Aktif' : 'Nonaktif'"></span>
+                </td>
+                <td th:text="${khotib.maxJadwalPerBulan()} + '/bulan'"></td>
+                <td class="actions">
+                    <button class="btn btn-secondary btn-sm"
+                            th:data-khotib="${khotib}"
+                            th:onclick="'editKhotib(' + ${@jacksonObjectMapper.writeValueAsString(khotib)} + ')'">
+                        Edit
+                    </button>
+                    <button class="btn btn-warning btn-sm"
+                            th:onclick="'toggleKhotibActive(' + ${khotib.id()} + ')'">
+                        Toggle
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            th:onclick="'deleteKhotib(' + ${khotib.id()} + ')'">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Khotib Modal -->
+<div class="modal" id="khotibModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Form Khotib</h3>
+            <button class="modal-close" onclick="closeModal('khotibModal')">&times;</button>
+        </div>
+        <form id="khotibForm">
+            <div class="modal-body">
+                <input id="khotibId" name="id" type="hidden">
+                <div class="form-group">
+                    <label for="khotibNama">Nama *</label>
+                    <input class="form-control" id="khotibNama" name="nama" required type="text">
+                </div>
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="khotibTelepon">No. Telepon</label>
+                        <input class="form-control" id="khotibTelepon" name="noTelepon" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="khotibSpesialisasi">Spesialisasi Tema</label>
+                        <input class="form-control" id="khotibSpesialisasi" name="spesialisasiTema" type="text">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="khotibAlamat">Alamat</label>
+                    <input class="form-control" id="khotibAlamat" name="alamat" type="text">
+                </div>
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="khotibLatitude">Latitude</label>
+                        <input class="form-control" id="khotibLatitude" name="latitude" step="any" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="khotibLongitude">Longitude</label>
+                        <input class="form-control" id="khotibLongitude" name="longitude" step="any" type="number">
+                    </div>
+                </div>
+                <div class="grid grid-3">
+                    <div class="form-group">
+                        <label for="khotibPengalaman">Pengalaman (tahun)</label>
+                        <input class="form-control" id="khotibPengalaman" min="0" name="pengalamanTahun" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="khotibRating">Rating (1-5)</label>
+                        <input class="form-control" id="khotibRating" max="5" min="1" name="rating" step="0.1"
+                               type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="khotibMaxJadwal">Maks Jadwal/Bulan</label>
+                        <input class="form-control" id="khotibMaxJadwal" max="8" min="1"
+                               name="maxJadwalPerBulan" type="number" value="4">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input checked id="khotibAktif" name="aktif" type="checkbox"> Aktif
+                    </label>
+                </div>
+                <div class="form-group" th:if="${!areas.isEmpty()}">
+                    <label>Preferensi Area</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 5px;" th:each="area : ${areas}">
+                            <input name="preferredAreaIds" th:value="${area.id()}" type="checkbox">
+                            <span th:text="${area.nama()}"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('khotibModal')" type="button">Batal</button>
+                <button class="btn btn-primary" type="submit">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script th:inline="javascript">
+    // Override editKhotib to handle Thymeleaf object
+    function editKhotib(khotibData) {
+        let data = typeof khotibData === 'string' ? JSON.parse(khotibData) : khotibData;
+        document.getElementById('khotibId').value = data.id;
+        document.getElementById('khotibNama').value = data.nama;
+        document.getElementById('khotibTelepon').value = data.noTelepon || '';
+        document.getElementById('khotibAlamat').value = data.alamat || '';
+        document.getElementById('khotibLatitude').value = data.latitude || '';
+        document.getElementById('khotibLongitude').value = data.longitude || '';
+        document.getElementById('khotibSpesialisasi').value = data.spesialisasiTema || '';
+        document.getElementById('khotibPengalaman').value = data.pengalamanTahun || '';
+        document.getElementById('khotibRating').value = data.rating || '';
+        document.getElementById('khotibAktif').checked = data.aktif;
+        document.getElementById('khotibMaxJadwal').value = data.maxJadwalPerBulan || 4;
+
+        document.querySelectorAll('input[name="preferredAreaIds"]').forEach(cb => cb.checked = false);
+        if (data.preferredAreaIds) {
+            data.preferredAreaIds.forEach(areaId => {
+                const cb = document.querySelector(`input[name="preferredAreaIds"][value="${areaId}"]`);
+                if (cb) cb.checked = true;
+            });
+        }
+
+        openModal('khotibModal');
+    }
+</script>
+</body>
+</html>
