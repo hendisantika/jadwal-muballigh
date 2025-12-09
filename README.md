@@ -12,6 +12,28 @@ PSO)**.
 - **Hibernate/JPA** - ORM
 - **Docker Compose** - Container untuk PostgreSQL
 
+## Image Screen shots
+
+Dashboard Page
+
+![Dashboard Page](img/dashboard.png "Dashboard Page")
+
+Jadwal Khotib
+
+![Jadwal Khotib](img/Jadwal-Khotib.png "Jadwal Khotib")
+
+Manajemen Area
+
+![Manajemen Area](img/Manajemen-Area.png "Manajemen Area")
+
+Manajemen Khotib
+
+![Manajemen Khotib](img/Manajemen-Khotib.png "Manajemen Khotib")
+
+Manajemen Masjid
+
+![Manajemen Masjid](img/Manajemen-Masjid.png "Manajemen Masjid")
+
 ## Fitur
 
 ### Manajemen Data
