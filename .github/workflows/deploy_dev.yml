@@ -13,6 +13,7 @@ on:
       - 'Dockerfile'
       - 'docker-compose.yml'
       - 'pom.xml'
+      - 'nginx/**'
 
 env:
   DEPLOY_DIR: jadwal_muballigh
@@ -48,6 +49,7 @@ jobs:
           path: |
             image.tar.gz
             docker-compose.yml
+            nginx/jadwalmuballigh.persislabs.my.id.conf
 
   deploy:
     needs: build
@@ -67,7 +69,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           target: ~/${{ env.DEPLOY_DIR }}
-          source: "image.tar.gz,docker-compose.yml"
+          source: "image.tar.gz,docker-compose.yml,nginx/jadwalmuballigh.persislabs.my.id.conf"
           overwrite: true
 
       - name: Deploy via SSH
@@ -97,6 +99,11 @@ jobs:
             IMAGE_TAG=${IMAGE_TAG}
             ENVEOF
             sed -i 's/^[[:space:]]*//' .env
+
+            # Deploy nginx config
+            sudo cp nginx/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf
+            sudo ln -sf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-enabled/
+            sudo nginx -t && sudo systemctl reload nginx
 
             # Load pre-built Docker image
             echo "Loading Docker image..."
