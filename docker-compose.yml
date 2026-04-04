@@ -13,24 +13,3 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
-  db:
-    image: postgres:17
-    container_name: jadwal-muballigh-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: jadwal_muballigh
-      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
-    ports:
-      - "5435:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  pgdata:
