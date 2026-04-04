@@ -101,9 +101,9 @@ jobs:
             sed -i 's/^[[:space:]]*//' .env
 
             # Deploy nginx config
-            sudo cp nginx/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf
-            sudo ln -sf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-enabled/
-            sudo nginx -t && sudo systemctl reload nginx
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S cp nginx/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S ln -sf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-enabled/
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S nginx -t && echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S systemctl reload nginx
 
             # Load pre-built Docker image
             echo "Loading Docker image..."
