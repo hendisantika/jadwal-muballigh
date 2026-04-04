@@ -67,8 +67,16 @@ jobs:
           CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
         run: |
           mkdir -p ssl
-          printf '%s\n' "$CLOUDFLARE_ORIGIN_CERT" > ssl/origin.crt
-          printf '%s\n' "$CLOUDFLARE_ORIGIN_KEY" > ssl/origin.key
+          echo "$CLOUDFLARE_ORIGIN_CERT" > ssl/origin.crt
+          echo "$CLOUDFLARE_ORIGIN_KEY" > ssl/origin.key
+          # Fix literal \n if secret was stored as single line
+          sed -i 's/\\n/\n/g' ssl/origin.crt ssl/origin.key
+          # Validate cert
+          echo "Cert file info:"
+          head -1 ssl/origin.crt
+          tail -1 ssl/origin.crt
+          wc -l ssl/origin.crt
+          openssl x509 -in ssl/origin.crt -noout -subject && echo "Cert OK" || echo "Cert INVALID"
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
