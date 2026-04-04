@@ -76,7 +76,7 @@ jobs:
             cd ~/${{ env.DEPLOY_DIR }}
 
             # Create .env file with environment variables
-            cat > .env << 'ENVEOF'
+            cat > .env <<ENVEOF
             APP_SERVER_PORT=${{ vars.APP_SERVER_PORT_DEV }}
             SPRING_DATASOURCE_URL=${{ vars.SPRING_DATASOURCE_URL_DEV }}
             SPRING_DATASOURCE_USERNAME=${{ vars.SPRING_DATASOURCE_USERNAME_DEV }}
@@ -84,13 +84,16 @@ jobs:
             SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE_DEV }}
             ENVEOF
 
+            # Remove leading spaces from .env
+            sed -i 's/^[[:space:]]*//' .env
+
             # Build and deploy with docker compose
-            docker compose down || true
+            docker compose down --remove-orphans || true
             docker compose up -d --build
 
             # Verify deployment
-            sleep 10
-            if docker compose ps | grep -q "running"; then
+            sleep 15
+            if docker compose ps --format json | grep -q '"running"'; then
               echo "Deployment successful!"
               docker compose ps
             else
