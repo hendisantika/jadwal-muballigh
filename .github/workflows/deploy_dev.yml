@@ -100,14 +100,20 @@ jobs:
             ENVEOF
             sed -i 's/^[[:space:]]*//' .env
 
-            # Generate self-signed SSL cert if not exists (for Cloudflare Full mode)
-            if [ ! -f /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.crt ]; then
-              echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S mkdir -p /etc/nginx/ssl
-              echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-                -keyout /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.key \
-                -out /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.crt \
-                -subj "/CN=jadwalmuballigh.persislabs.my.id"
-            fi
+            # Install Cloudflare Origin CA cert
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S mkdir -p /etc/nginx/ssl
+            cat > /tmp/origin.crt << 'CERTEOF'
+            ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
+            CERTEOF
+            sed -i 's/^[[:space:]]*//' /tmp/origin.crt
+            cat > /tmp/origin.key << 'KEYEOF'
+            ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
+            KEYEOF
+            sed -i 's/^[[:space:]]*//' /tmp/origin.key
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S cp /tmp/origin.crt /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.crt
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S cp /tmp/origin.key /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.key
+            echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S chmod 600 /etc/nginx/ssl/jadwalmuballigh.persislabs.my.id.key
+            rm -f /tmp/origin.crt /tmp/origin.key
 
             # Deploy nginx config
             echo '${{ secrets.SUDO_PASSWORD }}' | sudo -S cp nginx/jadwalmuballigh.persislabs.my.id.conf /etc/nginx/sites-available/jadwalmuballigh.persislabs.my.id.conf
