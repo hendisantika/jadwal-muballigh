@@ -62,10 +62,13 @@ jobs:
           name: app-artifacts
 
       - name: Prepare SSL certs
+        env:
+          CLOUDFLARE_ORIGIN_CERT: ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
+          CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
         run: |
           mkdir -p ssl
-          echo "${{ secrets.CLOUDFLARE_ORIGIN_CERT }}" > ssl/origin.crt
-          echo "${{ secrets.CLOUDFLARE_ORIGIN_KEY }}" > ssl/origin.key
+          printf '%s\n' "$CLOUDFLARE_ORIGIN_CERT" > ssl/origin.crt
+          printf '%s\n' "$CLOUDFLARE_ORIGIN_KEY" > ssl/origin.key
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
