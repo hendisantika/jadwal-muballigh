@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: ${IMAGE_NAME:-jadwal-muballigh}:${IMAGE_TAG:-latest}
     container_name: jadwal-muballigh
     restart: unless-stopped
     ports:
