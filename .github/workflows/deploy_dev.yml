@@ -79,7 +79,7 @@ jobs:
           openssl x509 -in ssl/origin.crt -noout -subject && echo "Cert OK" || echo "Cert INVALID"
 
       - name: Copy files to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: 103.31.204.189
           username: deployer
