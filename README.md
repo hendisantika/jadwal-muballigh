@@ -1,11 +1,14 @@
 # Jadwal Muballigh
 
+[![Deploy to Dev Server](https://github.com/hendisantika/jadwal-muballigh/actions/workflows/deploy_dev.yml/badge.svg)](https://github.com/hendisantika/jadwal-muballigh/actions/workflows/deploy_dev.yml)
+[![Check Pull Request](https://github.com/hendisantika/jadwal-muballigh/actions/workflows/check_pr.yml/badge.svg)](https://github.com/hendisantika/jadwal-muballigh/actions/workflows/check_pr.yml)
+
 Aplikasi web untuk manajemen jadwal khotib Jum'at dengan optimasi menggunakan algoritma **Particle Swarm Optimization (
 PSO)**.
 
 ## Teknologi
 
-- **Spring Boot 4.0.0** - Framework Java
+- **Spring Boot 4.1.0** - Framework Java
 - **JDK 25** - Java Development Kit
 - **PostgreSQL 18** - Database
 - **Thymeleaf** - Template Engine
@@ -93,7 +96,7 @@ docker compose up -d
 ./mvnw spring-boot:run
 ```
 
-4. Buka browser dan akses `http://localhost:8080`
+4. Buka browser dan akses `http://localhost:8010`
 
 ## Struktur Project
 
@@ -168,6 +171,23 @@ Pada profile `dev`, aplikasi akan otomatis mengisi data contoh:
 - 5 Area (Pusat Kota, Utara, Selatan, Timur, Barat)
 - 8 Masjid dengan koordinat di Bandung
 - 10 Khotib dengan berbagai pengalaman dan rating
+
+## CI/CD
+
+- **Check Pull Request** (`.github/workflows/check_pr.yml`) - Build dan test setiap pull request.
+- **Deploy to Dev Server** (`.github/workflows/deploy_dev.yml`) - Setiap push ke `main` (perubahan pada `src/`,
+  `pom.xml`, `Dockerfile`, `docker-compose.yml`, `nginx/`) akan:
+    1. Build JAR dengan Maven dan membuat Docker image.
+    2. Menyalin image, `docker-compose.yml`, konfigurasi Nginx, dan sertifikat Cloudflare Origin ke server.
+    3. Menjalankan ulang container via `docker compose`.
+- Deployment dijalankan secara berurutan (`concurrency: deploy-dev`) agar beberapa merge yang berdekatan tidak saling
+  bentrok.
+
+### Port Deployment
+
+Di dalam container aplikasi berjalan di port `8010`. Di server dev, port host dipetakan ke `8011`
+(`APP_SERVER_PORT_DEV`) karena port `8010` sudah dipakai layanan lain, dan Nginx meneruskan
+`jadwalmuballigh.persislabs.my.id` ke `127.0.0.1:8011`.
 
 ## Lisensi
 

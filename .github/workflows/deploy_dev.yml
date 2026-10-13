@@ -15,6 +15,10 @@ on:
       - 'pom.xml'
       - 'nginx/**'
 
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
 env:
   DEPLOY_DIR: jadwal_muballigh
   IMAGE_NAME: jadwal-muballigh
